@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>InvoiceRun</title>
+    <style>
+      :root { --ink: #172033; --muted: #56617a; --line: #d5dce8; --paper: #f5f7fb; --accent: #2f4fd8; }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--paper); color: var(--ink); font-family: system-ui, sans-serif; line-height: 1.5; }
+      main { max-width: 62rem; margin: 0 auto; padding: 2rem 1.25rem 3rem; }
+      h1 { margin: 0; font-size: 1.9rem; letter-spacing: -.02em; }
+      h2 { margin: 0; font-size: 1.1rem; }
+      .eyebrow { margin: 0 0 .25rem; color: var(--accent); font-size: .75rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+      .identity { margin: .4rem 0 0; color: var(--muted); }
+      .totals { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .75rem; margin: 1.5rem 0; padding: 0; }
+      .totals div { padding: .9rem 1rem; border: 1px solid var(--line); border-radius: .6rem; background: #fff; }
+      .totals dt { color: var(--muted); font-size: .8rem; }
+      .totals dd { margin: 0; font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+      section { margin-top: 1rem; border: 1px solid var(--line); border-radius: .6rem; background: #fff; }
+      section header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem; padding: .9rem 1rem; border-bottom: 1px solid var(--line); }
+      section header span { color: var(--muted); font-size: .85rem; }
+      .scroll { overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th, td { padding: .6rem 1rem; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+      th:first-child, td:first-child { text-align: left; white-space: normal; }
+      thead th { color: var(--muted); font-size: .75rem; letter-spacing: .05em; text-transform: uppercase; }
+      tbody th { font-weight: 400; }
+      tfoot th, tfoot td { border-bottom: 0; font-weight: 700; }
+      footer { margin-top: 1.5rem; color: var(--muted); font-size: .8rem; overflow-wrap: anywhere; }
+      :focus-visible { outline: 3px solid #88a6ff; outline-offset: 2px; }
+      @media print { body { background: #fff; } section, .totals div { break-inside: avoid; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">InvoiceRun</p>
+      <h1>Monthly invoice report</h1>
+      <p class="identity" id="identity"></p>
+      <dl class="totals" id="totals"></dl>
+      <div id="invoices"></div>
+      <div id="vat"></div>
+      <footer id="footer"></footer>
+    </main>
+    <script id="invoice-report-data" type="application/json">__INVOICE_REPORT_DATA__</script>
+    <script>
+      "use strict";
+      const data = JSON.parse(document.getElementById("invoice-report-data").textContent);
+      const { plan, analysis } = data;
+      const formatter = new Intl.NumberFormat("en-GB", { style: "currency", currency: plan.currency });
+      const money = (cents) => formatter.format(cents / 100);
+      const escapes = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+      const esc = (value) => String(value).replace(/[&<>"']/g, (character) => escapes[character]);
+      const table = (label, head, body, foot) => `
+        <div class="scroll" role="region" aria-label="${esc(label)}" tabindex="0">
+          <table>
+            <thead><tr>${head.map((title) => `<th scope="col">${title}</th>`).join("")}</tr></thead>
+            <tbody>${body}</tbody>
+            <tfoot>${foot}</tfoot>
+          </table>
+        </div>`;
+
+      document.title = `${data.company} · ${plan.billingDate} · InvoiceRun`;
+      document.getElementById("identity").textContent =
+        `${data.company} · Billing date ${plan.billingDate} · Revision ${data.revision}`;
+      document.getElementById("totals").innerHTML = [
+        ["Invoices", analysis.invoiceCount],
+        ["Discount", money(analysis.totalDiscountCents)],
+        ["Net", money(analysis.totalNetCents)],
+        ["VAT", money(analysis.totalVatCents)],
+        ["Gross", money(analysis.totalGrossCents)],
+      ].map(([label, value]) => `<div><dt>${label}</dt><dd>${esc(value)}</dd></div>`).join("");
+
+      document.getElementById("invoices").innerHTML = plan.invoices.map((invoice) => `
+        <section>
+          <header><h2>${esc(invoice.customerName)}</h2><span>${esc(invoice.invoiceNumber)} · ${esc(invoice.customerId)}</span></header>
+          ${table(`Invoice lines of ${invoice.customerName}`,
+            ["Line", "Quantity", "Unit price", "Discount", "Net", "VAT", "Gross"],
+            invoice.lines.map((line) => `
+              <tr>
+                <th scope="row">${esc(line.description)}</th>
+                <td>${line.quantity}</td>
+                <td>${money(line.unitPriceCents)}</td>
+                <td>${line.discountPercent} %</td>
+                <td>${money(line.netCents)}</td>
+                <td>${money(line.vatCents)}</td>
+                <td>${money(line.grossCents)}</td>
+              </tr>`).join(""),
+            `<tr><th scope="row" colspan="4">Invoice total</th><td>${money(invoice.netCents)}</td>
+               <td>${money(invoice.vatCents)}</td><td>${money(invoice.grossCents)}</td></tr>`)}
+        </section>`).join("");
+
+      document.getElementById("vat").innerHTML = `
+        <section>
+          <header><h2>VAT summary</h2></header>
+          ${table("VAT summary", ["Rate", "Net", "VAT"],
+            analysis.vatRates.map((rate) => `
+              <tr><th scope="row">${rate.vatPercent} %</th><td>${money(rate.netCents)}</td><td>${money(rate.vatCents)}</td></tr>`).join(""),
+            `<tr><th scope="row">Total</th><td>${money(analysis.totalNetCents)}</td><td>${money(analysis.totalVatCents)}</td></tr>`)}
+        </section>`;
+
+      document.getElementById("footer").textContent =
+        `Run ${data.runId} · Rules ${plan.ruleVersion} · Synthetic demo data, not a real invoice.`;
+    </script>
+  </body>
+</html>

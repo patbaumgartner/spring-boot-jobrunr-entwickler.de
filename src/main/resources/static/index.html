@@ -1,0 +1,1056 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#111827" />
+    <title>InvoiceRun Console</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #172033;
+        --muted: #56617a;
+        --line: #dde3ec;
+        --paper: #f5f7fb;
+        --white: #fff;
+        --navy: #111827;
+        --blue: #355df1;
+        --teal: #0f766e;
+        --amber: #9a6700;
+        --red: #b42318;
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-width: 20rem;
+        background: var(--paper);
+        color: var(--ink);
+      }
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      :focus-visible {
+        outline: 3px solid #88a6ff;
+        outline-offset: 3px;
+      }
+
+      header {
+        background: var(--navy);
+        color: var(--white);
+      }
+      .header-inner {
+        max-width: 1180px;
+        min-height: 72px;
+        margin: auto;
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+      .mark {
+        width: 40px;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background: var(--blue);
+        font-weight: 850;
+      }
+      .brand strong,
+      .brand span {
+        display: block;
+      }
+      .brand strong {
+        font-size: 15px;
+      }
+      .brand span {
+        margin-top: 2px;
+        color: #b7c0d3;
+        font-size: 12px;
+      }
+      nav {
+        display: flex;
+        gap: 8px;
+      }
+      nav a {
+        border: 1px solid #394458;
+        border-radius: 8px;
+        color: var(--white);
+        padding: 9px 12px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 750;
+      }
+      nav a:hover {
+        background: #202b3d;
+      }
+
+      main {
+        max-width: 1180px;
+        margin: auto;
+        padding: 32px 24px 48px;
+      }
+      .hero {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 18px;
+      }
+      .eyebrow {
+        margin: 0 0 6px;
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 850;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font-size: clamp(32px, 5vw, 54px);
+        line-height: 1;
+        letter-spacing: -0.055em;
+      }
+      .intro {
+        max-width: 620px;
+        margin: 10px 0 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .health {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--white);
+        padding: 9px 12px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 750;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #16a34a;
+      }
+      .health.checking .dot {
+        background: var(--amber);
+      }
+      .health.down .dot {
+        background: var(--red);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 300px minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+      }
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--white);
+        box-shadow: 0 12px 30px rgba(23, 32, 51, 0.05);
+        overflow: hidden;
+      }
+      .panel-head {
+        min-height: 54px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border-bottom: 1px solid var(--line);
+        padding: 12px 16px;
+      }
+      .panel h2 {
+        margin: 0;
+        font-size: 14px;
+      }
+
+      form {
+        padding: 16px;
+      }
+      fieldset {
+        margin: 0;
+        padding: 0;
+        border: 0;
+      }
+      .field {
+        margin-bottom: 14px;
+      }
+      label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 12px;
+        font-weight: 800;
+      }
+      input,
+      select {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid #cbd4e1;
+        border-radius: 8px;
+        background: var(--white);
+        color: var(--ink);
+        padding: 9px 11px;
+      }
+      input:focus,
+      select:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px #355df125;
+        outline: none;
+      }
+      input:user-invalid,
+      select:user-invalid {
+        border-color: var(--red);
+      }
+      .hint {
+        margin: 5px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+      .button {
+        min-height: 44px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        color: var(--ink);
+        padding: 9px 12px;
+        cursor: pointer;
+        font-weight: 800;
+      }
+      .button.primary {
+        border-color: var(--blue);
+        background: var(--blue);
+        color: var(--white);
+      }
+      .button.primary:hover {
+        background: #294bcc;
+      }
+      .button:disabled {
+        cursor: wait;
+        opacity: 0.65;
+      }
+
+      .detail {
+        margin: 16px 0 0;
+        border-radius: 10px;
+        background: var(--navy);
+        color: var(--white);
+        min-height: 260px;
+        padding: 18px;
+        font-size: 12px;
+      }
+      .detail-empty {
+        color: #b7c0d3;
+        line-height: 1.5;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin: 0 0 12px;
+      }
+      .detail-grid div {
+        min-width: 0;
+      }
+      dt {
+        color: #aeb8ca;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      dd {
+        margin: 3px 0 0;
+        font-weight: 800;
+        overflow-wrap: anywhere;
+      }
+      .links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .links a {
+        border: 1px solid #465267;
+        border-radius: 7px;
+        color: var(--white);
+        padding: 7px 8px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .links a.disabled {
+        pointer-events: none;
+        opacity: 0.4;
+      }
+      .detail h3 {
+        margin: 14px 0 6px;
+        color: #aeb8ca;
+        font-size: 10px;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+      .steps {
+        margin: 0 0 4px;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 4px;
+        counter-reset: step;
+      }
+      .steps li {
+        counter-increment: step;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border-radius: 7px;
+        background: #1c2638;
+        padding: 6px 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-weight: 700;
+      }
+      .steps li::before {
+        content: counter(step);
+        width: 18px;
+        aspect-ratio: 1;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #34425a;
+        font-size: 10px;
+      }
+      .steps .repeated {
+        margin-left: auto;
+        border-radius: 999px;
+        background: #fff4d6;
+        color: #7a5200;
+        padding: 1px 7px;
+        font-family: inherit;
+        font-size: 10px;
+      }
+      .steps-empty {
+        margin: 0;
+        color: #b7c0d3;
+      }
+      .error {
+        margin: 0 0 4px;
+        border-left: 3px solid #ff8f85;
+        padding: 6px 8px;
+        background: #2a1f2a;
+        color: #ffd7d2;
+        overflow-wrap: anywhere;
+      }
+
+      .right {
+        min-width: 0;
+        display: grid;
+        gap: 16px;
+      }
+      .icon-button {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        color: var(--ink);
+        cursor: pointer;
+        font-weight: 900;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 12px 14px;
+        text-align: left;
+        white-space: nowrap;
+      }
+      th {
+        background: #fafbfd;
+        color: var(--muted);
+        font-size: 10px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      tbody tr {
+        cursor: pointer;
+      }
+      tbody tr:hover {
+        background: #f7f9ff;
+      }
+      tbody tr.selected {
+        background: #edf1ff;
+      }
+      .run-id {
+        display: inline-block;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 5px 8px;
+        font-size: 11px;
+        font-weight: 850;
+      }
+      .status::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+      .PENDING,
+      .UNCONFIRMED,
+      .SCHEDULED,
+      .ENQUEUED,
+      .AWAITING,
+      .PROCESSING {
+        background: #fff4d6;
+        color: var(--amber);
+      }
+      .READY,
+      .DELIVERED,
+      .SUCCEEDED {
+        background: #e7f5f2;
+        color: var(--teal);
+      }
+      .REJECTED,
+      .FAILED {
+        background: #fff0ee;
+        color: var(--red);
+      }
+      .EXPIRED,
+      .DELETED,
+      .NONE {
+        background: #edf0f5;
+        color: #626a7a;
+      }
+      .empty {
+        padding: 32px 16px;
+        color: var(--muted);
+        text-align: center;
+      }
+      .empty strong {
+        display: block;
+        color: var(--ink);
+      }
+
+      .receipt-list {
+        display: grid;
+        gap: 8px;
+        padding: 12px 16px 16px;
+      }
+      .receipt {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 10px 12px;
+      }
+      .receipt strong {
+        display: block;
+        font-size: 12px;
+      }
+      .receipt code {
+        display: block;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 10px;
+        overflow-wrap: anywhere;
+      }
+      .attempts {
+        border-radius: 999px;
+        background: #edf1ff;
+        color: var(--blue);
+        padding: 5px 8px;
+        font-size: 11px;
+        font-weight: 850;
+      }
+      .toast {
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        max-width: 360px;
+        border-radius: 9px;
+        background: var(--navy);
+        color: var(--white);
+        padding: 12px 14px;
+        box-shadow: 0 16px 36px #11182733;
+        font-size: 12px;
+        opacity: 0;
+        transform: translateY(8px);
+        pointer-events: none;
+        transition: 0.18s ease;
+      }
+      .toast.visible {
+        opacity: 1;
+        transform: none;
+      }
+      [hidden] {
+        display: none !important;
+      }
+
+      @media (max-width: 850px) {
+        .hero {
+          align-items: start;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .detail {
+          margin-top: 0;
+        }
+      }
+      @media (max-width: 620px) {
+        .header-inner {
+          min-height: 64px;
+          padding-inline: 16px;
+        }
+        nav a:first-child {
+          display: none;
+        }
+        main {
+          padding: 22px 16px 36px;
+        }
+        .hero {
+          display: block;
+        }
+        .health {
+          display: inline-flex;
+          margin-top: 14px;
+        }
+        .actions {
+          grid-template-columns: 1fr;
+        }
+        th,
+        td {
+          padding-inline: 10px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .toast {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <div class="brand">
+          <div class="mark" aria-hidden="true">IR</div>
+          <div>
+            <strong>InvoiceRun</strong><span>Durable billing console</span>
+          </div>
+        </div>
+        <nav aria-label="InvoiceRun navigation">
+          <a href="/api/receipts">Receipts</a>
+          <a href="/actuator/health">Health</a>
+          <a id="dashboard-link" href="http://localhost:8000/dashboard"
+            >JobRunr</a
+          >
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="title">
+        <div>
+          <p class="eyebrow">Monthly billing workspace</p>
+          <h1 id="title">Invoice operations</h1>
+          <p class="intro">
+            Create an invoice run, follow each durable step and check the
+            portal's receipt.
+          </p>
+        </div>
+        <div
+          class="health checking"
+          id="health"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="dot" aria-hidden="true"></span
+          ><span id="health-label">Checking application</span>
+        </div>
+      </section>
+
+      <div class="grid">
+        <aside>
+          <section class="panel" aria-labelledby="create-heading">
+            <div class="panel-head">
+              <h2 id="create-heading">Create invoice run</h2>
+            </div>
+            <form
+              id="create-form"
+              action="/api/invoice-runs"
+              method="POST"
+              aria-labelledby="create-heading"
+            >
+              <fieldset>
+                <legend hidden>Invoice run settings</legend>
+                <div class="field">
+                  <label for="snapshot">Input fixture</label>
+                  <select id="snapshot" name="snapshotId" required>
+                    <option value="standard">Standard monthly run</option>
+                    <option value="correction">Correction run</option>
+                  </select>
+                  <p class="hint">Uses a fixed synthetic billing snapshot.</p>
+                </div>
+                <div class="field">
+                  <label for="revision">Revision</label>
+                  <input
+                    id="revision"
+                    name="revision"
+                    type="number"
+                    value="1"
+                    min="1"
+                    step="1"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label for="runAt">Processing time</label>
+                  <input id="runAt" name="runAt" type="datetime-local" />
+                  <p class="hint">Leave empty to process immediately.</p>
+                </div>
+              </fieldset>
+              <div class="actions">
+                <button class="button primary" id="submit-run" type="submit">
+                  Create invoice run
+                </button>
+                <button class="button" type="reset">Reset</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="detail" aria-labelledby="detail-heading">
+            <h2 id="detail-heading" hidden>Selected invoice run</h2>
+            <div class="detail-empty" id="detail-empty">
+              Select a run to inspect its durable steps, status and
+              artifacts.
+            </div>
+            <div id="detail-content" hidden></div>
+          </section>
+        </aside>
+
+        <div class="right">
+          <section class="panel" aria-labelledby="runs-heading">
+            <div class="panel-head">
+              <h2 id="runs-heading">Invoice runs</h2>
+              <button
+                class="icon-button"
+                id="refresh-runs"
+                type="button"
+                title="Refresh invoice runs"
+                aria-label="Refresh invoice runs"
+              >
+                ↻
+              </button>
+            </div>
+            <div
+              class="table-wrap"
+              role="region"
+              aria-labelledby="runs-heading"
+              tabindex="0"
+            >
+              <table>
+                <caption hidden>
+                  Invoice runs and delivery states
+                </caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Run</th>
+                    <th scope="col">Billing date</th>
+                    <th scope="col">Revision</th>
+                    <th scope="col">Job</th>
+                    <th scope="col">Package</th>
+                    <th scope="col">Delivery</th>
+                  </tr>
+                </thead>
+                <tbody id="runs-body"></tbody>
+              </table>
+            </div>
+            <div class="empty" id="runs-empty" hidden>
+              <strong>No invoice runs yet</strong>Create your first run.
+            </div>
+          </section>
+
+          <section class="panel" aria-labelledby="receipts-heading">
+            <div class="panel-head">
+              <h2 id="receipts-heading">Portal receipts</h2>
+              <button
+                class="icon-button"
+                id="refresh-receipts"
+                type="button"
+                title="Refresh portal receipts"
+                aria-label="Refresh portal receipts"
+              >
+                ↻
+              </button>
+            </div>
+            <div class="receipt-list" id="receipt-list">
+              <div class="empty"><strong>Loading receipts</strong></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div id="announcer" class="visually-hidden" aria-live="polite"></div>
+
+    <script>
+      "use strict";
+      const form = document.querySelector("#create-form");
+      const submit = document.querySelector("#submit-run");
+      const runsBody = document.querySelector("#runs-body");
+      const runsEmpty = document.querySelector("#runs-empty");
+      const detailEmpty = document.querySelector("#detail-empty");
+      const detailContent = document.querySelector("#detail-content");
+      const receiptList = document.querySelector("#receipt-list");
+      const toast = document.querySelector("#toast");
+      // The JobRunr dashboard listens on its own port of the same host.
+      const dashboard = `${location.protocol}//${location.hostname}:8000/dashboard`;
+      document.querySelector("#dashboard-link").href = dashboard;
+      const dateFormat = new Intl.DateTimeFormat("en-GB", {
+        dateStyle: "medium",
+      });
+      const dateTimeFormat = new Intl.DateTimeFormat("en-GB", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+      const billingDate = (run) =>
+        dateFormat.format(new Date(`${run.billingDate}T12:00:00`));
+      let selectedId = null;
+      let toastTimer;
+
+      const notify = (message) => {
+        clearTimeout(toastTimer);
+        toast.textContent = message;
+        toast.classList.add("visible");
+        toastTimer = setTimeout(() => toast.classList.remove("visible"), 3000);
+      };
+
+      const status = (value) => {
+        const span = document.createElement("span");
+        span.className = `status ${value}`;
+        span.textContent = value;
+        return span;
+      };
+
+      const text = (tag, className, value) => {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        element.textContent = value;
+        return element;
+      };
+
+      const showDetail = (run) => {
+        selectedId = run.id;
+        detailEmpty.hidden = true;
+        detailContent.hidden = false;
+
+        const grid = document.createElement("dl");
+        grid.className = "detail-grid";
+        for (const [label, value] of [
+          ["Company", run.company],
+          ["Billing date", `${billingDate(run)} · revision ${run.revision}`],
+          ["JobRunr job", run.jobState || "Not enqueued"],
+          [
+            "Processing",
+            run.runAt
+              ? dateTimeFormat.format(new Date(run.runAt))
+              : "Immediately",
+          ],
+          ["Package", run.packageStatus],
+          ["Delivery", run.deliveryStatus],
+          ["Receipt", run.receipt || "Pending"],
+          ["Run ID", run.id],
+        ]) {
+          const item = document.createElement("div");
+          item.append(text("dt", "", label), text("dd", "", value));
+          grid.append(item);
+        }
+
+        // Every execution of a step body: a step that a retry skipped appears once.
+        const stepsHeading = text("h3", "", "Executed durable steps");
+        let steps;
+        if (run.executedSteps.length === 0) {
+          steps = text("p", "steps-empty", "No step has run yet.");
+        } else {
+          steps = document.createElement("ol");
+          steps.className = "steps";
+          const seen = new Set();
+          for (const step of run.executedSteps) {
+            const item = text("li", "", step);
+            if (seen.has(step)) item.append(text("span", "repeated", "repeated"));
+            seen.add(step);
+            steps.append(item);
+          }
+        }
+
+        const sections = [grid, stepsHeading, steps];
+        if (run.lastError) {
+          sections.push(
+            text("h3", "", "Last error"),
+            text("p", "error", run.lastError),
+          );
+        }
+
+        const links = document.createElement("div");
+        links.className = "links";
+        for (const [artifact, label] of [
+          ["report", "Report"],
+          ["plan", "Plan"],
+          ["analysis", "Analysis"],
+          ["csv", "CSV"],
+          ["manifest", "Manifest"],
+          ["snapshot", "Snapshot"],
+          ["package", "Download ZIP"],
+        ]) {
+          const link = text("a", "", label);
+          link.href = `/api/invoice-runs/${run.id}/${artifact}`;
+          if (!run.links[artifact]) {
+            link.classList.add("disabled");
+            link.setAttribute("aria-disabled", "true");
+            link.tabIndex = -1;
+          }
+          if (artifact === "report") link.target = "_blank";
+          links.append(link);
+        }
+        if (run.jobId) {
+          const job = text("a", "", "Job history ↗");
+          job.href = `${dashboard}/jobs/${run.jobId}`;
+          job.target = "_blank";
+          links.append(job);
+        }
+        sections.push(text("h3", "", "Artifacts"), links);
+        detailContent.replaceChildren(...sections);
+        runsBody
+          .querySelectorAll("tr")
+          .forEach((row) =>
+            row.classList.toggle("selected", row.dataset.id === run.id),
+          );
+      };
+
+      async function refreshRuns(announce = false) {
+        try {
+          const response = await fetch("/api/invoice-runs", {
+            headers: { Accept: "application/json" },
+          });
+          if (!response.ok)
+            throw new Error(`Could not load runs (${response.status})`);
+          const runs = await response.json();
+          runsBody.replaceChildren();
+          runsEmpty.hidden = runs.length !== 0;
+          document.querySelector(".table-wrap").hidden = runs.length === 0;
+          for (const run of runs) {
+            const row = document.createElement("tr");
+            row.dataset.id = run.id;
+            row.tabIndex = 0;
+            row.classList.toggle("selected", run.id === selectedId);
+            const runCell = document.createElement("th");
+            runCell.scope = "row";
+            const runId = document.createElement("span");
+            runId.className = "run-id";
+            runId.title = run.id;
+            runId.textContent = run.id;
+            runCell.append(runId);
+
+            const date = text("td", "", billingDate(run));
+            const revision = text("td", "", String(run.revision));
+            const jobCell = text("td", "", "");
+            const packageCell = text("td", "", "");
+            const deliveryCell = text("td", "", "");
+            jobCell.append(status(run.jobState || "NONE"));
+            packageCell.append(status(run.packageStatus));
+            deliveryCell.append(status(run.deliveryStatus));
+            row.append(
+              runCell,
+              date,
+              revision,
+              jobCell,
+              packageCell,
+              deliveryCell,
+            );
+            row.addEventListener("click", () => showDetail(run));
+            row.addEventListener("keydown", (event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                showDetail(run);
+              }
+            });
+            runsBody.append(row);
+          }
+          const selected = runs.find((run) => run.id === selectedId);
+          if (selected) showDetail(selected);
+          if (announce)
+            notify(
+              `${runs.length} invoice run${runs.length === 1 ? "" : "s"} loaded`,
+            );
+        } catch (error) {
+          notify(error.message);
+        }
+      }
+
+      async function refreshReceipts(announce = false) {
+        try {
+          const response = await fetch("/api/receipts", {
+            headers: { Accept: "application/json" },
+          });
+          if (!response.ok)
+            throw new Error(`Could not load receipts (${response.status})`);
+          const receipts = await response.json();
+          receiptList.replaceChildren();
+          if (receipts.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.append(text("strong", "", "No portal receipts"));
+            receiptList.append(empty);
+          } else {
+            for (const receipt of receipts) {
+              const item = document.createElement("div");
+              item.className = "receipt";
+              const identity = document.createElement("div");
+              identity.append(
+                text("strong", "", receipt.receipt),
+                text("code", "", receipt.transferId),
+              );
+              const attempts = text(
+                "span",
+                "attempts",
+                `${receipt.attempts} attempt${receipt.attempts === 1 ? "" : "s"}`,
+              );
+              item.append(identity, attempts);
+              receiptList.append(item);
+            }
+          }
+          if (announce)
+            notify(
+              `${receipts.length} portal receipt${receipts.length === 1 ? "" : "s"} loaded`,
+            );
+        } catch (error) {
+          notify(error.message);
+        }
+      }
+
+      async function refreshHealth() {
+        const health = document.querySelector("#health");
+        health.className = "health checking";
+        document.querySelector("#health-label").textContent =
+          "Checking application";
+        try {
+          const response = await fetch("/actuator/health", {
+            headers: { Accept: "application/json" },
+          });
+          const data = await response.json();
+          const up = response.ok && data.status === "UP";
+          health.className = up ? "health" : "health down";
+          document.querySelector("#health-label").textContent = up
+            ? "Application healthy"
+            : "Application unavailable";
+        } catch {
+          health.className = "health down";
+          document.querySelector("#health-label").textContent =
+            "Application unavailable";
+        }
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+        const payload = {
+          snapshotId: form.elements.snapshotId.value,
+          revision: Number(form.elements.revision.value),
+        };
+        if (form.elements.runAt.value)
+          payload.runAt = new Date(form.elements.runAt.value).toISOString();
+
+        submit.disabled = true;
+        submit.textContent = "Creating…";
+        try {
+          const response = await fetch("/api/invoice-runs", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+          if (!response.ok) {
+            const problem = await response.json().catch(() => null);
+            throw new Error(
+              problem?.detail ||
+                `Could not create invoice run (${response.status})`,
+            );
+          }
+          const run = await response.json();
+          selectedId = run.id;
+          notify("Invoice run created");
+          await Promise.all([refreshRuns(), refreshReceipts()]);
+          showDetail(run);
+        } catch (error) {
+          notify(error.message);
+        } finally {
+          submit.disabled = false;
+          submit.textContent = "Create invoice run";
+        }
+      });
+
+      document
+        .querySelector("#refresh-runs")
+        .addEventListener("click", () => refreshRuns(true));
+      document
+        .querySelector("#refresh-receipts")
+        .addEventListener("click", () => refreshReceipts(true));
+
+      refreshHealth();
+      refreshRuns();
+      refreshReceipts();
+      setInterval(
+        () => Promise.all([refreshRuns(), refreshReceipts(), refreshHealth()]),
+        3000,
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "id": "monthly-standard",
+  "company": "Alpine Software GmbH",
+  "billingDate": "2026-11-30",
+  "ruleVersion": "invoice-v1",
+  "currency": "EUR",
+  "customers": [
+    {
+      "id": "C-1001",
+      "name": "Limmat Logistics AG",
+      "lines": [
+        {
+          "id": "line-1",
+          "description": "Managed hosting",
+          "quantity": 1,
+          "unitPriceCents": 125000,
+          "discountPercent": 0,
+          "vatPercent": 8
+        },
+        {
+          "id": "line-2",
+          "description": "Support flat rate",
+          "quantity": 1,
+          "unitPriceCents": 48000,
+          "discountPercent": 10,
+          "vatPercent": 8
+        }
+      ]
+    },
+    {
+      "id": "C-1002",
+      "name": "Rheinwerk Handel GmbH",
+      "lines": [
+        {
+          "id": "line-3",
+          "description": "Software licence",
+          "quantity": 12,
+          "unitPriceCents": 7900,
+          "discountPercent": 15,
+          "vatPercent": 8
+        }
+      ]
+    },
+    {
+      "id": "C-1003",
+      "name": "Stern Beratung AG",
+      "lines": [
+        {
+          "id": "line-4",
+          "description": "Premium support hours",
+          "quantity": 18,
+          "unitPriceCents": 18000,
+          "discountPercent": 5,
+          "vatPercent": 8
+        }
+      ]
+    }
+  ]
+}
